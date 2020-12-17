@@ -59,7 +59,6 @@ cam_per_d0 <- function(OSLdata, minD0, method = "CAM", De = 1, De.error = 2, D0 
       "yend" = 2
     )
     ggplotlist <- list()
-
   }
   else {
     intersect.points.start <- which(diff(above) != 0)
