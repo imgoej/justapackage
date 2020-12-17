@@ -24,6 +24,3 @@ Returns a dataframe of calculated equivalent doses and corresponding D0 threshol
 Calculates equivalent dose for each specified D0 threshold.
 Estimates are then plotted against D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
 }
-\details{
-Given two points $(x_1, y_1 \pm \delta y)$
-}
