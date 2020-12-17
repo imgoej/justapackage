@@ -3,6 +3,8 @@
 #' Calculates equivalent dose for specified D0 threshold using.
 #' Estimates are then plotted against D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
 #'
+#' @import ggplot2
+#' @import Luminescence
 #'@param data 3-column data frame containing (in order) De, De.error and D0 features. Alternatively you can specify colnames or column numbers of said features (see De/De.error/D0).
 #'@param minD0 Vector of D0 thresholds.
 #'@param method Method of estimating central tendency in equivalent dose analysis. Currently supported are "CAM" (default) and "ADM".
