@@ -7,20 +7,20 @@
 cam_per_d0(OSLdata, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...)
 }
 \arguments{
-\item{OSLdata}{3-column data frame containing (in order) De, De.error and D0 features. Alternatively you can specify colname or location of said features (see De/De.error/D0).}
+\item{OSLdata}{3-column data frame containing (in order) De, De.error and D0 features. Alternatively you can specify colnames or column numbers of said features (see De/De.error/D0).}
 
 \item{minD0}{Vector of D0 thresholds.}
 
 \item{method}{Method of estimating central tendency in equivalent dose analysis. Currently supported are "CAM" (default) and "ADM".}
 
-\item{sigma_m}{Intrinsic level of overdispersion in sample to use in CAM analysis.}
+\item{...}{Arguments passed to CAM or ADM. For example one might be interested in specifying "log" or "sigmab" in the CAM procedure or "sigma_m" in the ADM procedure.}
 
 \item{De/De.error/D0}{Column names of relevant variables in the OSL dataset. Selects the first three columns by default.}
 }
 \value{
-Returns a dataframe of calculated equivalent doses and corresponding D0 thresholds. Also return coordinate(s) of intersect(s) along with estimated error. To see how error is estimated, see "details".
+Returns a dataframe of equivalent doses and D0 thresholds along with intersect coordinate(s) and error estimates.
 }
 \description{
-Calculates equivalent dose for each specified D0 threshold.
+Calculates equivalent dose for specified D0 threshold using.
 Estimates are then plotted against D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
 }
