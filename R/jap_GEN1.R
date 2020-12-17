@@ -3,16 +3,16 @@
 #' Calculates equivalent dose for specified D0 threshold using.
 #' Estimates are then plotted against D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
 #'
-#'@param OSLdata 3-column data frame containing (in order) De, De.error and D0 features. Alternatively you can specify colnames or column numbers of said features (see De/De.error/D0).
+#'@param data 3-column data frame containing (in order) De, De.error and D0 features. Alternatively you can specify colnames or column numbers of said features (see De/De.error/D0).
 #'@param minD0 Vector of D0 thresholds.
 #'@param method Method of estimating central tendency in equivalent dose analysis. Currently supported are "CAM" (default) and "ADM".
 #'@param De/De.error/D0 Column names of relevant variables in the OSL dataset. Selects the first three columns by default.
 #'@param ... Arguments passed to CAM or ADM. For example one might be interested in specifying "log" or "sigmab" in the CAM procedure or "sigma_m" in the ADM procedure.
 #'@return Returns a dataframe of equivalent doses and D0 thresholds along with intersect coordinate(s) and error estimates.
 #'@export
-cam_per_d0 <- function(OSLdata, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...) {
-  unsatDATA <- OSLdata[complete.cases(OSLdata[, c(De, De.error, D0)]), ]
-  satDATA <- OSLdata[!complete.cases(OSLdata[, c(De, De.error)]), ]
+cam_per_d0 <- function(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...) {
+  unsatDATA <- data[complete.cases(data[, c(De, De.error, D0)]), ]
+  satDATA <- data[!complete.cases(data[, c(De, De.error)]), ]
   satDATA <- satDATA[!is.na(satDATA[, D0]), ]
   minD0 <- minD0[minD0 <= max(unsatDATA[, D0])]
   DATA <- lapply(minD0, function(x) {
