@@ -37,7 +37,7 @@ cam_per_d0 <- function(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3
           verbose = F,
           sigma_m = 0.2,
           ...))[1:2]
-      DATA.tmp <- cbind.data.frame(DATA.tmp)
+      DATA.tmp <- as.data.frame(DATA.tmp)
     }
     DATA.tmp <- cbind.data.frame(DATA.tmp, "n" = n, "nsaturated" = nsaturated, "nsaturatedPROP" = nsaturated/(nsaturated+n))
     return(DATA.tmp)
