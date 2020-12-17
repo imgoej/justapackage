@@ -4,10 +4,10 @@
 \alias{cam_per_d0}
 \title{Cam per D0}
 \usage{
-cam_per_d0(OSLdata, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...)
+cam_per_d0(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...)
 }
 \arguments{
-\item{OSLdata}{3-column data frame containing (in order) De, De.error and D0 features. Alternatively you can specify colnames or column numbers of said features (see De/De.error/D0).}
+\item{data}{3-column data frame containing (in order) De, De.error and D0 features. Alternatively you can specify colnames or column numbers of said features (see De/De.error/D0).}
 
 \item{minD0}{Vector of D0 thresholds.}
 
