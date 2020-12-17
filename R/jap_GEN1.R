@@ -1,14 +1,14 @@
 #' Cam per D0
 #'
-#' Calculates equivalent dose for each specified D0 threshold.
+#' Calculates equivalent dose for specified D0 threshold using.
 #' Estimates are then plotted against D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
 #'
-#'@param OSLdata 3-column data frame containing (in order) De, De.error and D0 features. Alternatively you can specify colname or location of said features (see De/De.error/D0).
+#'@param OSLdata 3-column data frame containing (in order) De, De.error and D0 features. Alternatively you can specify colnames or column numbers of said features (see De/De.error/D0).
 #'@param minD0 Vector of D0 thresholds.
 #'@param method Method of estimating central tendency in equivalent dose analysis. Currently supported are "CAM" (default) and "ADM".
-#'@param sigma_m Intrinsic level of overdispersion in sample to use in CAM analysis.
 #'@param De/De.error/D0 Column names of relevant variables in the OSL dataset. Selects the first three columns by default.
-#'@return Returns a dataframe of calculated equivalent doses and corresponding D0 thresholds. Also return coordinate(s) of intersect(s) along with estimated error. To see how error is estimated, see "details".
+#'@param ... Arguments passed to CAM or ADM. For example one might be interested in specifying "log" or "sigmab" in the CAM procedure or "sigma_m" in the ADM procedure.
+#'@return Returns a dataframe of equivalent doses and D0 thresholds along with intersect coordinate(s) and error estimates.
 #'@export
 cam_per_d0 <- function(OSLdata, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...) {
   unsatDATA <- OSLdata[complete.cases(OSLdata[, c(De, De.error, D0)]), ]
@@ -33,6 +33,7 @@ cam_per_d0 <- function(OSLdata, minD0, method = "CAM", De = 1, De.error = 2, D0 
           unsatDATA.tmp[, c(De, De.error)],
           plot = F,
           verbose = F,
+          sigma_m = 0.2,
           ...))[1:2]
       DATA.tmp <- cbind.data.frame(DATA.tmp)
     }
