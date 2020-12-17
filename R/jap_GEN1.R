@@ -9,7 +9,7 @@
 #'@param sigma_m Intrinsic level of overdispersion in sample to use in CAM analysis.
 #'@param De/De.error/D0 Column names of relevant variables in the OSL dataset. Selects the first three columns by default.
 #'@return Returns a dataframe of calculated equivalent doses and corresponding D0 thresholds. Also return coordinate(s) of intersect(s) along with estimated error. To see how error is estimated, see "details".
-
+#'
 #'@export
 cam_per_d0 <- function(OSLdata, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...) {
   unsatDATA <- OSLdata[complete.cases(OSLdata[, c(De, De.error, D0)]), ]
