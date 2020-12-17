@@ -25,5 +25,5 @@ Calculates equivalent dose for each specified D0 threshold.
 Estimates are then plotted against D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
 }
 \details{
-$y_2+y_1$
+2+2
 }
