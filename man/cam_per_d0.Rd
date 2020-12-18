@@ -21,6 +21,6 @@ cam_per_d0(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...)
 Returns a dataframe of equivalent doses and D0 thresholds along with intersect coordinate(s) and error estimates.
 }
 \description{
-Calculates equivalent dose for specified D0 threshold using.
-Estimates are then plotted against D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
+Calculates equivalent dose for specified D0 thresholds.
+Estimates are then plotted against chosen D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
 }
