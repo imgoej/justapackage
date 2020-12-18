@@ -1,7 +1,7 @@
 #' Cam per D0
 #'
-#' Calculates equivalent dose for specified D0 threshold using.
-#' Estimates are then plotted against D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
+#' Calculates equivalent dose for specified D0 thresholds.
+#' Estimates are then plotted against chosen D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
 #'
 #' @import ggplot2
 #' @import Luminescence
