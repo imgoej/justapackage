@@ -1,13 +1,15 @@
+#' my complete cases
+#'
+#' @export
+my_complete_cases <- function(data) {
+  data <- do.call(data.frame, lapply(data, function(x) replace(x, is.infinite(x), NA)))
+  complete.cases(data)
+}
 #' Cam per D0
 #'
 #' Calculates equivalent dose for specified D0 thresholds.
 #' Estimates are then plotted against chosen D0 thresholds and the point of intersect is estimated using linear regression between the two points containing the intersect.
 #'
-#'@export
-my_complete_cases <- function(data) {
-  data <- do.call(data.frame, lapply(data, function(x) replace(x, is.infinite(x), NA)))
-  complete.cases(data)
-}
 #' @import ggplot2
 #' @import Luminescence
 #'@param data 3-column data frame containing (in order) De, De.error and D0 features. Alternatively you can specify colnames or column numbers of said features (see De/De.error/D0).
@@ -18,8 +20,8 @@ my_complete_cases <- function(data) {
 #'@return Returns a dataframe of equivalent doses and D0 thresholds along with intersect coordinate(s) and error estimates.
 #'@export
 cam_per_d0 <- function(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...) {
-  unsatDATA <- data[my_complete_cases(data[, c(De, De.error, D0)]), ]
-  satDATA <- data[!my_complete_cases(data[, c(De, De.error)]), ]
+  unsatDATA <- data[complete.cases(data[, c(De, De.error, D0)]), ]
+  satDATA <- data[!complete.cases(data[, c(De, De.error)]), ]
   satDATA <- satDATA[!is.na(satDATA[, D0]), ]
   minD0 <- minD0[minD0 <= max(unsatDATA[, D0])]
   DATA <- lapply(minD0, function(x) {
