@@ -20,8 +20,8 @@ my_complete_cases <- function(data) {
 #'@return Returns a dataframe of equivalent doses and D0 thresholds along with intersect coordinate(s) and error estimates.
 #'@export
 cam_per_d0 <- function(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...) {
-  unsatDATA <- data[complete.cases(data[, c(De, De.error, D0)]), ]
-  satDATA <- data[!complete.cases(data[, c(De, De.error)]), ]
+  unsatDATA <- data[my_complete_cases(data[, c(De, De.error, D0)]), ]
+  satDATA <- data[!my_complete_cases(data[, c(De, De.error)]), ]
   satDATA <- satDATA[!is.na(satDATA[, D0]), ]
   minD0 <- minD0[minD0 <= max(unsatDATA[, D0])]
   DATA <- lapply(minD0, function(x) {
