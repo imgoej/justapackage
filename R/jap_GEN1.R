@@ -19,18 +19,19 @@ my_complete_cases <- function(data) {
 #'@param ... Arguments passed to CAM or ADM. For example one might be interested in specifying "log" or "sigmab" in the CAM procedure or "sigma_m" in the ADM procedure.
 #'@return Returns a dataframe of equivalent doses and D0 thresholds along with intersect coordinate(s) and error estimates.
 #'@export
-cam_per_d0 <- function(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3, ...) {
+cam_per_d0 <- function(data, minD0, method = "CAM", ...) {
+  argg <- c(as.list(environment()), list(...))
+  argg <- do.call(cbind, argg[lengths(argg) == 1])
+  colnames(data) <- c("De", "De.error", "D0")
   unsatDATA <- data[my_complete_cases(data[, c(De, De.error, D0)]), ]
   satDATA <- data[!my_complete_cases(data[, c(De, De.error)]), ]
   satDATA <- satDATA[!is.na(satDATA[, D0]), ]
   minD0 <- minD0[minD0 <= max(unsatDATA[, D0])]
-  DATA <- lapply(minD0, function(x) {
+  DATA.print <- lapply(minD0, function(x) {
     unsatDATA.tmp <- unsatDATA[unsatDATA[, D0] >= x,]
     n <- nrow(unsatDATA.tmp)
     nsaturated <- nrow(satDATA[satDATA[, D0] >= x, ])
-    if(nrow(unsatDATA.tmp) <= 1) DATA.tmp <- NA
-    if(x > max(unsatDATA[, D0])) DATA.tmp <- NA
-    else {
+    if(nrow(unsatDATA.tmp) > 1 & x < max(unsatDATA[, D0])) {
       if(method == "CAM")
         DATA.tmp <- get_RLum(calc_CentralDose(
           unsatDATA.tmp[, c(De, De.error)],
@@ -42,17 +43,17 @@ cam_per_d0 <- function(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3
           unsatDATA.tmp[, c(De, De.error)],
           plot = F,
           verbose = F,
-          sigma_m = 0.2,
           ...))[1:2]
       DATA.tmp <- as.data.frame(DATA.tmp)
-    }
-    DATA.tmp <- cbind.data.frame(DATA.tmp, "n" = n, "nsaturated" = nsaturated, "nsaturatedPROP" = nsaturated/(nsaturated+n))
-    return(DATA.tmp)
+      DATA.tmp <- cbind.data.frame(DATA.tmp, "n" = n, "nsaturated" = nsaturated, "nsaturatedPROP" = nsaturated/(nsaturated+n), argg)
+    } else {DATA.tmp <- NA
+    warning("Some D0 thresholds contain less than two observations and cannot be evaluated")}
+   return(DATA.tmp)
   })
-  DATA <- do.call(rbind, DATA)
-  DATA <- cbind.data.frame("minD0" = minD0, DATA)
-  DATA <- cbind.data.frame(DATA, "method" = method)
-  colnames(DATA)[2:3] <- c("de", "de.error")
+  DATA.print <- do.call(rbind, DATA.print)
+  DATA.print <- cbind.data.frame("minD0" = minD0, DATA.print)
+  colnames(DATA.print)[2:3] <- c("de", "de.error")
+  DATA <- na.omit(DATA.print)
   above <- DATA$de > DATA$minD0
   if(sum(abs(diff(above))) == 0) {
     intersect.results <- data.frame("intersect" = 0, "x-coordinates" = 0, "x-error" = 0, "y-coordinates" = 0, "y-error" = 0)
@@ -67,8 +68,7 @@ cam_per_d0 <- function(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3
       "yend" = 2
     )
     ggplotlist <- list()
-  }
-  else {
+  } else {
     intersect.points.start <- which(diff(above) != 0)
     intersect.points.end <- intersect.points.start+1
     slopes <- (DATA$de[intersect.points.end] - DATA$de[intersect.points.start]) / (DATA$minD0[intersect.points.end] - DATA$minD0[intersect.points.start])
@@ -86,8 +86,10 @@ cam_per_d0 <- function(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3
     y1 = DATA$de[intersect.points.start]
     y2 = DATA$de[intersect.points.end]
 
-    dx = sqrt( ((y1-x1)*(x2-x1)/(x2-x1-y2+y1)^2*DATA$de.error[intersect.points.end])^2 + ((x2^2-x2*x1-x2*y2+x1*y2)/(x2-x1-y2+y1)^2*DATA$de.error[intersect.points.start])^2)
+    dy1 = -(( (x2-x1)*(y2-x2) ) / (y1-y2+x2-x1)^2)
+    dy2 = ( (x2-x1)*(y1-x1) ) / (y2-y1-x2+x1)^2
 
+    dx = abs(dy1*DATA$de.error[intersect.points.start]) + abs(dy2*DATA$de.error[intersect.points.end])
 
     intersect.results <- data.frame("intersect" = 1:length(intersect.x), "x.y.coordinate" = intersect.x, "error" = dx)
     ggplotlist <- list(geom_segment(data = segment_data, aes(x = x, xend = xend, y = y, yend = yend), linetype = "dashed", color = "red"),
@@ -108,12 +110,12 @@ cam_per_d0 <- function(data, minD0, method = "CAM", De = 1, De.error = 2, D0 = 3
   cat("\n----------------------------------------------------------------------------------\n")
   cat(">> Results << ")
   cat("\n----------------------------------------------------------------------------------\n")
-  print.data.frame(DATA, print.gap = 2, digits = 4, row.names = F)
+  print.data.frame(DATA.print, print.gap = 2, digits = 4, row.names = F)
   cat("\n----------------------------------------------------------------------------------\n")
   cat(">> intersects << ")
   cat("\n----------------------------------------------------------------------------------\n")
   print.data.frame(intersect.results, row.names = F)
   if(sum(abs(diff(above))) == 0) print("I could not find any intersects")
   suppressMessages (print(p))
-  return(list(DATA, intersect.results))
+  return(list(DATA.print, intersect.results))
 }
