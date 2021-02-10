@@ -23,24 +23,24 @@ cam_per_d0 <- function(data, minD0, method = "CAM", ...) {
   argg <- c(as.list(environment()), list(...))
   argg <- do.call(cbind, argg[lengths(argg) == 1])
   colnames(data) <- c("De", "De.error", "D0")
-  unsatDATA <- data[my_complete_cases(data[, c(De, De.error, D0)]), ]
-  satDATA <- data[!my_complete_cases(data[, c(De, De.error)]), ]
-  satDATA <- satDATA[!is.na(satDATA[, D0]), ]
-  minD0 <- minD0[minD0 <= max(unsatDATA[, D0])]
+  unsatDATA <- data[my_complete_cases(data[, c("De", "De.error", "D0")]), ]
+  satDATA <- data[!my_complete_cases(data[, c("De", "De.error")]), ]
+  satDATA <- satDATA[!is.na(satDATA[, "D0"]), ]
+  minD0 <- minD0[minD0 <= max(unsatDATA[, "D0"])]
   DATA.print <- lapply(minD0, function(x) {
-    unsatDATA.tmp <- unsatDATA[unsatDATA[, D0] >= x,]
+    unsatDATA.tmp <- unsatDATA[unsatDATA[, "D0"] >= x,]
     n <- nrow(unsatDATA.tmp)
-    nsaturated <- nrow(satDATA[satDATA[, D0] >= x, ])
-    if(nrow(unsatDATA.tmp) > 1 & x < max(unsatDATA[, D0])) {
+    nsaturated <- nrow(satDATA[satDATA[, "D0"] >= x, ])
+    if(nrow(unsatDATA.tmp) > 1 & x < max(unsatDATA[, "D0"])) {
       if(method == "CAM")
         DATA.tmp <- get_RLum(calc_CentralDose(
-          unsatDATA.tmp[, c(De, De.error)],
+          unsatDATA.tmp[, c("De", "De.error")],
           plot = FALSE,
           verbose = FALSE,
           ...))[1:4]
       if(method == "ADM")
         DATA.tmp <- get_RLum(calc_AverageDose(
-          unsatDATA.tmp[, c(De, De.error)],
+          unsatDATA.tmp[, c("De", "De.error")],
           plot = F,
           verbose = F,
           ...))[1:2]
