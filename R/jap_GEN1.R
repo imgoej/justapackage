@@ -19,7 +19,7 @@ my_complete_cases <- function(data) {
 #'@param ... Arguments passed to CAM or ADM. For example one might be interested in specifying "log" or "sigmab" in the CAM procedure or "sigma_m" in the ADM procedure.
 #'@return Returns a dataframe of equivalent doses and D0 thresholds along with intersect coordinate(s) and error estimates.
 #'@export
-cam_per_d0 <- function(data, minD0, method = "CAM", ...) {
+cam_per_d0 <- function(data, minD0, method = "CAM", error.mode = "propagate", ...) {
   argg <- c(as.list(environment()), list(...))
   argg <- do.call(cbind, argg[lengths(argg) == 1])
   colnames(data) <- c("De", "De.error", "D0")
@@ -47,13 +47,13 @@ cam_per_d0 <- function(data, minD0, method = "CAM", ...) {
       DATA.tmp <- as.data.frame(DATA.tmp)
       DATA.tmp <- cbind.data.frame(DATA.tmp, "n" = n, "nsaturated" = nsaturated, "nsaturatedPROP" = nsaturated/(nsaturated+n), argg)
     } else {DATA.tmp <- NA
-    warning("Some D0 thresholds contain less than two observations and cannot be evaluated")}
+    warning("Some of the chosen D0 thresholds contain less than two observations and cannot be evaluated")}
    return(DATA.tmp)
   })
   DATA.print <- do.call(rbind, DATA.print)
   DATA.print <- cbind.data.frame("minD0" = minD0, DATA.print)
   colnames(DATA.print)[2:3] <- c("de", "de.error")
-  DATA <- na.omit(DATA.print)
+  DATA <- DATA.print[!is.na(DATA.print[, "de"]), ]
   above <- DATA$de > DATA$minD0
   if(sum(abs(diff(above))) == 0) {
     intersect.results <- data.frame("intersect" = 0, "x-coordinates" = 0, "x-error" = 0, "y-coordinates" = 0, "y-error" = 0)
@@ -86,17 +86,24 @@ cam_per_d0 <- function(data, minD0, method = "CAM", ...) {
     y1 = DATA$de[intersect.points.start]
     y2 = DATA$de[intersect.points.end]
 
-    dy1 = -(( (x2-x1)*(y2-x2) ) / (y1-y2+x2-x1)^2)
-    dy2 = ( (x2-x1)*(y1-x1) ) / (y2-y1-x2+x1)^2
+    if(error.mode == "propagate") {
+      dy1 = -(( (x2-x1)*(y2-x2) ) / (y1-y2+x2-x1)^2)
+      dy2 = ( (x2-x1)*(y1-x1) ) / (y2-y1-x2+x1)^2
+      dx = abs(dy1*DATA$de.error[intersect.points.start]) + abs(dy2*DATA$de.error[intersect.points.end])
+    }
+    if(error.mode == "w.error"){
+      distance = abs(x2-x1)
+      dratios = (intersect.x-x1)/distance
+      dx = DATA$de.error[intersect.points.start]*(1-dratios)+DATA$de.error[intersect.points.end]*dratios
+      }
 
-    dx = abs(dy1*DATA$de.error[intersect.points.start]) + abs(dy2*DATA$de.error[intersect.points.end])
-
-    intersect.results <- data.frame("intersect" = 1:length(intersect.x), "x.y.coordinate" = intersect.x, "error" = dx)
+    intersect.results = data.frame("intersect" = 1:nrow(DATA.print), "x.y.coordinate" = NA, "error" = NA)
+    intersect.results[1:length(intersect.x), c("x.y.coordinate", "error")] <- cbind(intersect.x, dx)
     ggplotlist <- list(geom_segment(data = segment_data, aes(x = x, xend = xend, y = y, yend = yend), linetype = "dashed", color = "red"),
                        geom_segment(data = segment_data, aes(x = xend, xend = xend, y = x, yend = yend), linetype = "dashed", color  = "red"),
                        geom_segment(data = segment_data, aes(x = DATA$minD0[intersect.points.start], xend = DATA$minD0[intersect.points.end], y = DATA$de[intersect.points.start], yend = DATA$de[intersect.points.end]), linetype = "dashed"))
   }
-  legenddata <- data.frame("label" = c("CAM", "1to1 line", "Regression line", "intersect line"), "dummyx" = 0, "dummyy" = 0)
+  legenddata <- data.frame("label" = c(method, "1to1 line", "Regression line", "intersect line"), "dummyx" = 0, "dummyy" = 0)
 
   suppressMessages(
     p <- ggplot(DATA, aes(x = minD0, y = de)) + geom_point(size = 3, shape = 23, fill = "black") + geom_errorbar(aes(ymin = de-de.error, ymax = de+de.error, width = 0.1*max(de))) + xlim(0, max(DATA$de)*2) + ylim(0, max(minD0)*2) + scale_x_continuous(breaks = minD0) +
