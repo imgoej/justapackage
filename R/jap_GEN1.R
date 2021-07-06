@@ -1,11 +1,5 @@
-#' Crit
-#'
-#' Does things.
-#' And returns things.
-#'
-#' @export
+### my_complete_cases ####
 
-### my complete cases ####
 #' my complete cases
 #'
 #' @export
@@ -15,6 +9,7 @@ my_complete_cases <- function(data) {
 }
 
 ### cam per D0 ####
+
 #' Cam per D0
 #'
 #' Calculates equivalent dose for specified D0 thresholds.
@@ -138,6 +133,7 @@ cam_per_d0 <- function(data, minD0, method = "CAM", error.mode = "propagate", ..
 }
 
 ### my SAR analyzer ####
+
 #' My SAR analyzer
 #'
 #' Does things.
@@ -304,6 +300,7 @@ my_SAR_analyzer2 <- function(Risoe.object, position = NULL, grain = NULL, run = 
 }
 
 ### crit ####
+
 #' Crit
 #'
 #' Does things.
@@ -331,6 +328,7 @@ crit <- function(criteria, error, signif = 4, limits, limittype = "<>") {
 
 
 ### my criteria function ####
+
 #' My criteria function
 #'
 #' Does things.
@@ -413,9 +411,8 @@ my_criteria_function2 <- function(data = NULL, index, blanks = NULL, keep.altern
   }
 }
 
-
-###
 ### my blanks checker ####
+
 #' My Blanks Checker
 #'
 #' Does things.
@@ -428,7 +425,9 @@ my_blanks_checker <- function(x, signal.threshold, interval = 6:10) {
   my.data.frame <- my.data.frame[my.data.frame$"Signal" > signal.threshold,]
   return(my.data.frame)
 }
+
 ### DR plotter ####
+
 #' My DR Plotter
 #'
 #' Does things.
@@ -477,6 +476,7 @@ my_plotter_dr <- function(data.object, by = "mean", plot = TRUE, drdose = 1, wid
 }
 
 ### my signal function ####
+
 #' My Signal Function
 #'
 #' Does things.
