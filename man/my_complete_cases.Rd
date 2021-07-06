@@ -2,11 +2,10 @@
 % Please edit documentation in R/jap_GEN1.R
 \name{my_complete_cases}
 \alias{my_complete_cases}
-\title{Crit}
+\title{my complete cases}
 \usage{
 my_complete_cases(data)
 }
 \description{
-Does things.
-And returns things.
+my complete cases
 }
