@@ -567,6 +567,7 @@ my_excel_copypaste <- function(object) {
 #' And returns things
 #'
 #' @export
+Disc = list(1:24)
 my_write_BayLum_files <- function(path,
                                   subsample.folder.names,
                                   Disc = NULL,
@@ -585,11 +586,13 @@ my_write_BayLum_files <- function(path,
 
   if(!is.null(Disc)) {
     # Disc
+    if(length(Disc) == 1) { Disc = rep(Disc, length(BayLum_files_path)) }
     for (j in 1:length(BayLum_files_path)) { write.csv(data.frame("position" = Disc[[j]]), paste(BayLum_files_path[j],"Disc.csv",sep=""), row.names = F) }
   }
 
   if(!is.null(DiscPos)) {
-    # Disc
+    # DiscPos
+    if(length(DiscPos) == 1) { DiscPos = rep(DiscPos, length(BayLum_files_path)) }
     for (j in 1:length(BayLum_files_path)) { write.csv(data.frame("position" = DiscPos[[j]][,1], "grain" = DiscPos[[j]][,2]), paste(BayLum_files_path[j],"DiscPos.csv",sep=""), row.names = F) }
   }
 
