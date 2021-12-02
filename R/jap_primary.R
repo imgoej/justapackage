@@ -1,4 +1,4 @@
-### my_complete_cases ####
+# my_complete_cases ####
 
 #' my complete cases
 #'
@@ -8,7 +8,7 @@ my_complete_cases <- function(data) {
   complete.cases(data)
 }
 
-### cam per D0 ####
+# cam per D0 ####
 
 #' Cam per D0
 #'
@@ -132,7 +132,7 @@ cam_per_d0 <- function(data, minD0, method = "CAM", error.mode = "propagate", ..
   return(list(DATA.print, intersect.results))
 }
 
-### my SAR analyzer ####
+# my SAR analyzer ####
 
 #' My SAR analyzer
 #'
@@ -299,7 +299,7 @@ my_SAR_analyzer2 <- function(Risoe.object, position = NULL, grain = NULL, run = 
   return(list(results = results, data = cbind(info, De.data, DR, STn20, Recyc_Depl_Recup, ID, label)))
 }
 
-### crit ####
+# crit ####
 
 #' Crit
 #'
@@ -327,7 +327,7 @@ crit <- function(criteria, error, signif = 4, limits, limittype = "<>") {
 }
 
 
-### my criteria function ####
+# my criteria function ####
 
 #' My criteria function
 #'
@@ -411,7 +411,7 @@ my_criteria_function2 <- function(data = NULL, index, blanks = NULL, keep.altern
   }
 }
 
-### my blanks checker ####
+# my blanks checker ####
 
 #' My Blanks Checker
 #'
@@ -426,7 +426,7 @@ my_blanks_checker <- function(x, signal.threshold, interval = 6:10) {
   return(my.data.frame)
 }
 
-### DR plotter ####
+# DR plotter ####
 
 #' My DR Plotter
 #'
@@ -475,7 +475,7 @@ my_plotter_dr <- function(data.object, by = "mean", plot = TRUE, drdose = 1, wid
   return(list("results" = data, "plot" = p))
 }
 
-### my signal function ####
+# my signal function ####
 
 #' My Signal Function
 #'
@@ -508,4 +508,108 @@ my_signal_function <- function(Risoe.object, LTYPE = "OSL", ID = NULL, set = NUL
   t <- seq(HIGH/NPOINTS, HIGH, by = HIGH/NPOINTS)
 
   data.frame("t" = t, "CTS.norm" = CTS, "n" = n, TYPE = LTYPE, "ID" = ID)
+}
+# my readerrate retriever ####
+
+#' My readerrate retriever
+#'
+#' Does things.
+#' And returns things.
+#'
+#' @export
+my_readerrate <- function(dr.model, date, method = "average", data.path = "C:/Users/fhaba/OneDrive - Danmarks Tekniske Universitet/OSLdata/Calibration/calibration_info.csv", day.lim = 60){
+
+  calib.file = read.csv(data.path)
+
+  if(!(dr.model %in% calib.file$dr.model)) {
+    print("chosen dr.model must be one of:")
+    print(unique(calib.file$dr.model))
+    stop("operation cancelled")
+  }
+
+  modeldata <- calib.file[calib.file$dr.model == dr.model,]
+
+  if(method == "lm") {
+    model <- lm(readerrate ~ as.Date(day), modeldata)
+    prediction <- predict.lm(model, data.frame("day" = as.Date(date)), se.fit = T)
+    output <- round(c(prediction[[1]], prediction[[2]]), 4)
+    output = c(output, nrow(modeldata))
+  }
+  if(method == "exp") {
+    model <- lm(log(readerrate) ~ as.Date(day), modeldata)
+    prediction <- predict.lm(model, data.frame("day" = as.Date(date)), se.fit = T)
+    output <- round(c(exp(prediction[[1]]), exp(prediction[[2]])), 4)
+    output = c(output, nrow(modeldata))
+  }
+  if(method == "average") {
+    modeldata = modeldata[modeldata$day <= as.Date(date) + day.lim & modeldata$day >= as.Date(date) - day.lim,]
+    mean = mean(modeldata[, "readerrate"])
+    if(nrow(modeldata) > 1) se = my_calc_sem(modeldata[, "readerrate"])
+    if(nrow(modeldata) == 1) se = modeldata$readerrate.error
+    output = round(c(mean, se), 4)
+    output = c(output, nrow(modeldata))
+  }
+
+  output = data.frame("readerrate" = output[1], "se" = output[2], "n" = output[3], "method" = method)
+  output
+}
+
+my_excel_copypaste <- function(object) {
+  print(object)
+  write.table(object, "clipboard", row.names = F, col.names = F, sep = "\t")
+}
+
+# my BayLum files creator ####
+
+#'My write BayLum files
+#'
+#'Does things
+#' And returns things
+#'
+#' @export
+my_write_BayLum_files <- function(path,
+                                  subsample.folder.name,
+                                  Disc = NULL,
+                                  DiscPos = NULL,
+                                  DRenv, DRenv.error,
+                                  DRsource, DRsource.error,
+                                  signal.integral, background.integral,
+                                  inflatePercent,
+                                  nbOfLastCycleToRemove) {
+
+  # setup folder paths
+  folder = paste(path, subsample.folder.name, sep ="")
+  dir.create(path = folder)
+  BayLum_files_path = paste(folder,"/",sep="")
+
+  if(!is.null(Disc)) {
+    # Disc
+    write.csv(data.frame("position" = position), paste(BayLum_files_path,"Disc.csv",sep=""), row.names = F)
+  }
+
+  if(!is.null(DiscPos)) {
+    # Disc
+    write.csv(data.frame("position" = DiscPos[,1], "grain" = DiscPos[,2]), paste(BayLum_files_path,"DiscPos.csv",sep=""), row.names = F)
+  }
+
+  # DoseEnv
+  write.csv(data.frame("obs"=DRenv , "var" = DRenv.error^2), paste(BayLum_files_path,"DoseEnv.csv",sep=""), row.names = F)
+
+  # DoseSource
+  write.csv(data.frame("obs"=DRsource , "var" = DRsource.error^2), paste(BayLum_files_path,"DoseSource.csv",sep=""), row.names = F)
+
+  # rule
+  write.csv(data.frame("[Param]" = c(
+    paste("beginSignal=",min(signal.integral), sep=" "),
+    paste("endSignal=",max(signal.integral), sep=" "),
+    paste("beginBackground=",min(background.integral), sep=" "),
+    paste("endBackground=",max(background.integral), sep=" "),
+    paste("beginTest=",min(signal.integral), sep=" "),
+    paste("endTest=",max(signal.integral), sep=" "),
+    paste("beginTestBackground=",min(background.integral), sep=" "),
+    paste("endTestBackground=",max(background.integral), sep=" "),
+    paste("inflatePercent=",inflatePercent, sep=" "),
+    paste("nbOfLastCycleToRemove=",nbOfLastCycleToRemove, sep=" ")
+  ), check.names = FALSE), paste(BayLum_files_path,"rule.csv",sep=""), row.names = F, quote = F)
+
 }
