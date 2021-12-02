@@ -6,17 +6,19 @@
 \usage{
 my_write_BayLum_files(
   path,
-  subsample.folder.name,
+  subsample.folder.names,
   Disc = NULL,
   DiscPos = NULL,
   DRenv,
   DRenv.error,
   DRsource,
   DRsource.error,
-  signal.integral,
-  background.integral,
-  inflatePercent,
-  nbOfLastCycleToRemove
+  begin.signal.integral,
+  end.signal.integral,
+  begin.background.integral,
+  end.background.integral,
+  inflatePercent = 0.025,
+  nbOfLastCycleToRemove = 2
 )
 }
 \description{

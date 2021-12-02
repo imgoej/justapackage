@@ -568,48 +568,57 @@ my_excel_copypaste <- function(object) {
 #'
 #' @export
 my_write_BayLum_files <- function(path,
-                                  subsample.folder.name,
+                                  subsample.folder.names,
                                   Disc = NULL,
                                   DiscPos = NULL,
                                   DRenv, DRenv.error,
                                   DRsource, DRsource.error,
-                                  signal.integral, background.integral,
-                                  inflatePercent,
-                                  nbOfLastCycleToRemove) {
+                                  begin.signal.integral, end.signal.integral,
+                                  begin.background.integral, end.background.integral,
+                                  inflatePercent = 0.025,
+                                  nbOfLastCycleToRemove=2) {
 
   # setup folder paths
-  folder = paste(path, subsample.folder.name, sep ="")
-  dir.create(path = folder)
+  folder = paste(path, subsample.folder.names, sep ="")
+  for (j in 1:length(folder)){ dir.create(path = folder[j]) }
   BayLum_files_path = paste(folder,"/",sep="")
 
   if(!is.null(Disc)) {
     # Disc
-    write.csv(data.frame("position" = position), paste(BayLum_files_path,"Disc.csv",sep=""), row.names = F)
+    for (j in 1:length(BayLum_files_path)) { write.csv(data.frame("position" = Disc[[j]]), paste(BayLum_files_path[j],"Disc.csv",sep=""), row.names = F) }
   }
 
   if(!is.null(DiscPos)) {
     # Disc
-    write.csv(data.frame("position" = DiscPos[,1], "grain" = DiscPos[,2]), paste(BayLum_files_path,"DiscPos.csv",sep=""), row.names = F)
+    for (j in 1:length(BayLum_files_path)) { write.csv(data.frame("position" = DiscPos[[j]][,1], "grain" = DiscPos[[j]][,2]), paste(BayLum_files_path[j],"DiscPos.csv",sep=""), row.names = F) }
   }
 
   # DoseEnv
-  write.csv(data.frame("obs"=DRenv , "var" = DRenv.error^2), paste(BayLum_files_path,"DoseEnv.csv",sep=""), row.names = F)
+  for (j in 1:length(BayLum_files_path)) { write.csv(data.frame("obs"=DRenv[j] , "var" = DRenv.error[j]^2), paste(BayLum_files_path[j],"DoseEnv.csv",sep=""), row.names = F) }
 
   # DoseSource
-  write.csv(data.frame("obs"=DRsource , "var" = DRsource.error^2), paste(BayLum_files_path,"DoseSource.csv",sep=""), row.names = F)
+  for (j in 1:length(BayLum_files_path)) { write.csv(data.frame("obs"=DRsource[j] , "var" = DRsource.error[j]^2), paste(BayLum_files_path[j],"DoseSource.csv",sep=""), row.names = F) }
+
+  if(length(begin.signal.integral) == 1) {begin.signal.integral = rep(begin.signal.integral, length(subsample.folder.names))}
+  if(length(end.signal.integral) == 1) {end.signal.integral = rep(end.signal.integral, length(subsample.folder.names))}
+  if(length(begin.background.integral) == 1) {begin.background.integral = rep(begin.background.integral, length(subsample.folder.names))}
+  if(length(end.background.integral) == 1) {end.background.integral = rep(end.background.integral, length(subsample.folder.names))}
+  if(length(inflatePercent) == 1) {inflatePercent = rep(inflatePercent, length(subsample.folder.names))}
+  if(length(nbOfLastCycleToRemove) == 1) {nbOfLastCycleToRemove = rep(nbOfLastCycleToRemove, length(subsample.folder.names))}
 
   # rule
-  write.csv(data.frame("[Param]" = c(
-    paste("beginSignal=",min(signal.integral), sep=" "),
-    paste("endSignal=",max(signal.integral), sep=" "),
-    paste("beginBackground=",min(background.integral), sep=" "),
-    paste("endBackground=",max(background.integral), sep=" "),
-    paste("beginTest=",min(signal.integral), sep=" "),
-    paste("endTest=",max(signal.integral), sep=" "),
-    paste("beginTestBackground=",min(background.integral), sep=" "),
-    paste("endTestBackground=",max(background.integral), sep=" "),
-    paste("inflatePercent=",inflatePercent, sep=" "),
-    paste("nbOfLastCycleToRemove=",nbOfLastCycleToRemove, sep=" ")
-  ), check.names = FALSE), paste(BayLum_files_path,"rule.csv",sep=""), row.names = F, quote = F)
-
+  for (j in 1:length(BayLum_files_path)) {
+    write.csv(data.frame("[Param]" = c(
+      paste("beginSignal=",begin.signal.integral[j], sep=" "),
+      paste("endSignal=",end.signal.integral[j], sep=" "),
+      paste("beginBackground=",begin.background.integral[j], sep=" "),
+      paste("endBackground=",end.background.integral[j], sep=" "),
+      paste("beginTest=",begin.signal.integral[j], sep=" "),
+      paste("endTest=",end.signal.integral[j], sep=" "),
+      paste("beginTestBackground=",begin.background.integral[j], sep=" "),
+      paste("endTestBackground=",end.background.integral[j], sep=" "),
+      paste("inflatePercent=",inflatePercent[j], sep=" "),
+      paste("nbOfLastCycleToRemove=",nbOfLastCycleToRemove[j], sep=" ")
+    ), check.names = FALSE), paste(BayLum_files_path[j],"rule.csv",sep=""), row.names = F, quote = F)
+  }
 }
