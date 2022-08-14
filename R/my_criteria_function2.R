@@ -1,7 +1,8 @@
 # my_criteria_function2 ####
 
 #' my_criteria_function2
-#'
+#' @import ggplot2
+#' @import Luminescence
 #' @export
 my_criteria_function2 <- function(data = NULL, index, blanks = NULL, keep.alternatives = F) {
   if(!is.null(blanks)) {

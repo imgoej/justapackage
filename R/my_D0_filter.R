@@ -1,7 +1,7 @@
 # my_D0_filter ####
 
 #' my_D0_filter
-#'
+#' @import Luminescence
 #' @export
 my_D0_filter <- function(OSLdata, range,method ="CAM_UL", ...) {
   colnames(OSLdata) <- c("De", "De.Error", "D0")

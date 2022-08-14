@@ -1,7 +1,8 @@
 # my_SAR_analyzer2 ####
 
 #' my_SAR_analyzer2
-#'
+#' @import ggplot2
+#' @import Luminescence
 #' @export
 my_SAR_analyzer2 <- function(Risoe.object, position = NULL, grain = NULL, run = NULL, set = NULL, ltype = "OSL", dtype = NULL, protocol = "unknown", keep.empty = TRUE, txtProgressBar = FALSE,
                              signal.integral = c(6:10), background.integral = c(346:395), rejection.criteria = list(
