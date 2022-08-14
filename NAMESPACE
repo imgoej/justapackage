@@ -2,6 +2,7 @@
 
 export(cam_per_d0)
 export(crit)
+export(my_D0_filter)
 export(my_SAR_analyzer2)
 export(my_blanks_checker)
 export(my_complete_cases)
