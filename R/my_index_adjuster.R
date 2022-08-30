@@ -4,14 +4,14 @@
 #' @export
 my_index_adjuster <- function(index = NULL, add = NULL, remove = NULL) {
   if(!is.null(add)){
-    for (i in 1:length(EX)) {
-      EX[[i]][add] <- TRUE
+    for (i in 1:length(index)) {
+      index[[i]][add] <- TRUE
     }
   }
   if(!is.null(remove)){
-    for (i in 1:length(EX)) {
-      EX[[i]][remove] <- FALSE
+    for (i in 1:length(index)) {
+      index[[i]][remove] <- FALSE
     }
   }
-  EX
+  index
 }
