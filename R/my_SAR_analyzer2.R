@@ -11,7 +11,7 @@ my_SAR_analyzer2 <- function(Risoe.object, position = NULL, grain = NULL, run = 
                                recuperation.rate = NA,
                                testdose.error = NA,
                                palaeodose.error = NA,
-                               exceed.max.regpoint = NA),
+                               exceed.max.regpoint = TRUE),
                              sig0 = 0.025,
                              sigmab = NULL,
                              background.count.distribution =  "poisson",
