@@ -18,7 +18,7 @@ my_SAR_analyzer2(
   signal.integral = c(6:10),
   background.integral = c(346:395),
   rejection.criteria = list(recycling.ratio = NA, recuperation.rate = NA, testdose.error
-    = NA, palaeodose.error = NA, exceed.max.regpoint = NA),
+    = NA, palaeodose.error = NA, exceed.max.regpoint = TRUE),
   sig0 = 0.025,
   sigmab = NULL,
   background.count.distribution = "poisson",
