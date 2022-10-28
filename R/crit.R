@@ -11,7 +11,7 @@ crit <- function(criteria, error, signif = 4, limits, limittype = "<>") {
   criteria <- data[, 1]
   error <- data[, 2]
   if(limittype == "<>") {
-    index <- (criteria + abs(error) >= limits[1]) & (criteria - abs(error) < limits[2])
+    index <- (criteria + abs(error) >= limits[1]) & (criteria - abs(error) <= limits[2])
   }
   if(limittype == ">") {
     index <- (criteria - abs(error) > limits[1])
