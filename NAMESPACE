@@ -2,6 +2,7 @@
 
 export(crit)
 export(my_D0_filter)
+export(my_D0_filter2)
 export(my_DRC_viewer)
 export(my_SAR_analyzer2)
 export(my_blanks_checker)
