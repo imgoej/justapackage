@@ -14,7 +14,7 @@ my_nll_desaver <- function(x, bin.file) {
   X <- as.data.frame(X)
 
   # set binx-file name as column name
-  colnames(X) <- rep(binx.file, ncol(X))
+  colnames(X) <- rep(bin.file, ncol(X))
 
   # copy to clipboard
   write.table(X, "clipboard", sep = "\t", col.names = T, row.names = F)
