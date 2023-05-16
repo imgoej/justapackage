@@ -162,7 +162,44 @@ my_SAR_analyzer2 <- function(Risoe.object, position = NULL, grain = NULL, run = 
 
   func.results = list(results = results, data = cbind(info, De.data, DR, STn20, Recyc_Depl_Recup, ID, label))
   
+      upper.error.interpolation.List <- lapply(1:nrow(func.results$data), function(i) {
   
+  formula.string <- as.character(func.results$results$formula[[i]])
+  numbers.extr <- unlist(regmatches(formula.string, gregexpr('\\(?[0-9,.]+', formula.string)))
+  numbers.extr <- as.numeric(gsub('\\(', '-', gsub(',', '', x)))
+  Dc <- numbers.extr[4]
+  Da <- numbers.extr[1]
+  
+  LxTx <- (func.results$data$Ln[i] - func.results$data$Ln.BG[i]) / (func.results$data$Tn[i] - func.results$data$Tn.BG[i])
+  
+  
+  signal.start.stop <- na.omit(as.numeric(unlist(strsplit(func.results$data$signal.range[i], " "))))
+  background.start.stop <- na.omit(as.numeric(unlist(strsplit(func.results$data$background.range[i], " "))))
+  n = length(seq(signal.start.stop[1],signal.start.stop[2], 1))
+  m = length(seq(background.start.stop[1],background.start.stop[2], 1))
+  k <- m / n 
+  
+  Y.0 <- func.results$data$Ln[i]
+  Y.1 <- func.results$data$Ln.BG[i]*k
+  LnLx.relError <-  sqrt((Y.0 + Y.1/k^2))/(Y.0 - Y.1/k)
+  
+  Y.0 <- func.results$data$Tn[i]
+  Y.1 <- func.results$data$Tn.BG[i]*k
+  TnTx.relError <-  sqrt((Y.0 + Y.1/k^2))/(Y.0 - Y.1/k)
+  
+  LxTx.relError <- sqrt(LnLx.relError^2 + TnTx.relError^2)
+  LxTx.Error <- abs(LxTx * LxTx.relError)
+  
+  if (is.nan(LxTx.Error)) LxTx.Error <- 0
+  LxTx.Error <- sqrt(LxTx.Error^2 + (sig0 * LxTx)^2)
+  De.upper.error.limit <- -Dc*log(-(LxTx+LxTx.Error-Da) / Da)
+  
+  return(data.frame(LxTx, LxTx.Error, De.upper.error.limit))
+})
+
+upper.error.interpolation <- do.call(rbind.data.frame, upper.error.interpolation.List)
+
+func.results$data <- cbind.data.frame(func.results$data, upper.error.interpolation)
   
 
   if(plot.drc == TRUE) {
@@ -251,45 +288,6 @@ my_SAR_analyzer2 <- function(Risoe.object, position = NULL, grain = NULL, run = 
     )
     func.results$norm.lxtx = norm.drc
     func.results$formula = formula
-    
-    upper.error.interpolation.List <- lapply(1:nrow(func.results$data), function(i) {
-  
-  formula.string <- as.character(func.results$results$formula[[i]])
-  numbers.extr <- unlist(regmatches(formula.string, gregexpr('\\(?[0-9,.]+', formula.string)))
-  numbers.extr <- as.numeric(gsub('\\(', '-', gsub(',', '', x)))
-  Dc <- numbers.extr[4]
-  Da <- numbers.extr[1]
-  
-  LxTx <- (func.results$data$Ln[i] - func.results$data$Ln.BG[i]) / (func.results$data$Tn[i] - func.results$data$Tn.BG[i])
-  
-  
-  signal.start.stop <- na.omit(as.numeric(unlist(strsplit(func.results$data$signal.range[i], " "))))
-  background.start.stop <- na.omit(as.numeric(unlist(strsplit(func.results$data$background.range[i], " "))))
-  n = length(seq(signal.start.stop[1],signal.start.stop[2], 1))
-  m = length(seq(background.start.stop[1],background.start.stop[2], 1))
-  k <- m / n 
-  
-  Y.0 <- func.results$data$Ln[i]
-  Y.1 <- func.results$data$Ln.BG[i]*k
-  LnLx.relError <-  sqrt((Y.0 + Y.1/k^2))/(Y.0 - Y.1/k)
-  
-  Y.0 <- func.results$data$Tn[i]
-  Y.1 <- func.results$data$Tn.BG[i]*k
-  TnTx.relError <-  sqrt((Y.0 + Y.1/k^2))/(Y.0 - Y.1/k)
-  
-  LxTx.relError <- sqrt(LnLx.relError^2 + TnTx.relError^2)
-  LxTx.Error <- abs(LxTx * LxTx.relError)
-  
-  if (is.nan(LxTx.Error)) LxTx.Error <- 0
-  LxTx.Error <- sqrt(LxTx.Error^2 + (sig0 * LxTx)^2)
-  De.upper.error.limit <- -Dc*log(-(LxTx+LxTx.Error-Da) / Da)
-  
-  return(data.frame(LxTx, LxTx.Error, De.upper.error.limit))
-})
-
-upper.error.interpolation <- do.call(rbind.data.frame, upper.error.interpolation.List)
-
-func.results$data <- cbind.data.frame(func.results$data, upper.error.interpolation)
 
     return(list("plot" = p, "results" = func.results)) } else{
       return(func.results)
