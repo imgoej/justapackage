@@ -192,9 +192,9 @@ my_SAR_analyzer2 <- function(Risoe.object, position = NULL, grain = NULL, run = 
   
   if (is.nan(LxTx.Error)) LxTx.Error <- 0
   LxTx.Error <- sqrt(LxTx.Error^2 + (sig0 * LxTx)^2)
-  De.upper.error.limit <- -Dc*log(-(LxTx+LxTx.Error-Da) / Da)
+  De.Limit <- -Dc*log(-(LxTx+LxTx.Error-Da) / Da)
   
-  return(data.frame(LxTx, LxTx.Error, De.upper.error.limit))
+  return(data.frame(LxTx, LxTx.Error, De.Limit))
 })
 
 upper.error.interpolation <- do.call(rbind.data.frame, upper.error.interpolation.List)
