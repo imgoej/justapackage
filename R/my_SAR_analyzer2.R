@@ -166,7 +166,7 @@ my_SAR_analyzer2 <- function(Risoe.object, position = NULL, grain = NULL, run = 
   
   formula.string <- as.character(func.results$results$formula[[i]])
   numbers.extr <- unlist(regmatches(formula.string, gregexpr('\\(?[0-9,.]+', formula.string)))
-  numbers.extr <- as.numeric(gsub('\\(', '-', gsub(',', '', x)))
+  numbers.extr <- as.numeric(gsub('\\(', '-', gsub(',', '', numbers.extr)))
   Dc <- numbers.extr[4]
   Da <- numbers.extr[1]
   
