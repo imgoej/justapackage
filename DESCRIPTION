@@ -16,4 +16,5 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Imports:
 	ggplot2,
-	Luminescence
+	Luminescence,
+	cowplot
