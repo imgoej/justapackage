@@ -1,11 +1,11 @@
 Package: justapackage
 Title: Just a Package
-Version: 0.7.0
+Version: 0.8.0
 Authors@R: 
     person(given = "Frederik",
            family = "Baumgarten",
            role = c("aut", "cre"),
-           email = "fhaba@dtu.dk",
+           email = "fhb@outlook.dk",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: Provides quality of life tools and analytic functions to OSL dating.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to
@@ -17,4 +17,7 @@ RoxygenNote: 7.2.1
 Imports:
 	ggplot2,
 	Luminescence,
-	cowplot
+	cowplot,
+	BayLum,
+	data.table
+	
