@@ -6,6 +6,7 @@
 #'
 #' @import BayLum
 #' @import Luminescence
+#' @import data.table
 #'@param data Data.frame containing information about each disc and grain to be used in BayLum. This function is optimized for use with the output of Analyst. Importantly, the data.frame must contain columns: "Labcode", "DoseEnv", "DoseEnv_error", "DoseSource", "DoseSource_error", "NbOfLastCycleToRemove", "Filename", "Disc#", "Grain#", "Sig1", "Sig2", "BG1", "BG2". 
 #'@param folder.name Specify a name for a folder to be created in the current working directory which will contain the output of this function (defaults to "BayLum_files").
 #'@param inflatePercent Specify measurement uncertainty that should be incorporated (defaults to 0.025). 
