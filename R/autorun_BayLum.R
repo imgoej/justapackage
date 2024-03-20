@@ -2,8 +2,8 @@
 
 #' autorun_BayLum
 #'
-#' autorun_BayLum() takes the output of "Generate_DataFile()", "Generate_DataFile_MG()" or "Create_DataFile()" - which may have been built on several samples - and runs BayLum on each sample individually. \n
-#' BayLum is run until the Rubin-Gelman statistics are below 1.050 for "A", "D" and "sD" parameters for a sample. If a particular run fails to converge, the function will proceed to double the number of "Iter" used. The doubling proceeds until convergence is reached. \n
+#' autorun_BayLum() takes the output of "Generate_DataFile()", "Generate_DataFile_MG()" or "Create_DataFile()" - which may have been built on several samples - and runs BayLum on each sample individually. \cr
+#' BayLum is run until the Rubin-Gelman statistics are below 1.050 for "A", "D" and "sD" parameters for a sample. If a particular run fails to converge, the function will proceed to double the number of "Iter" used. The doubling proceeds until convergence is reached. \cr
 #' The function then stitches together the "A"-parameter MCMC-samples for each sample into one csv-file (this is the input for Age-Depth model of the ArchaeoPhases-package). The same is true for the "D"-parameter.
 #'
 #' @import BayLum
