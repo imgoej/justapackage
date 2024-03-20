@@ -2,13 +2,17 @@
 
 #' autorun_BayLum
 #'
-#' autorun_BayLum() takes the output of "Generate_DataFile()" and "Generate_DataFile_MG()" - which may have been built on several samples - and runs BayLum on each sample individually. BayLum is run until the Rubin-Gelman statistics are below 1.050 for "A", "D" and "sD" parameters for a sample. The function then stitches together the "A"-parameter MCMC-samples for each sample into one csv-file (this is the input for Age-Depth model of the ArchaeoPhases-package. The same is true for the "D"-parameter.
+#' autorun_BayLum() takes the output of "Generate_DataFile()", "Generate_DataFile_MG()" or "Create_DataFile()" - which may have been built on several samples - and runs BayLum on each sample individually.
+#'
+#' BayLum is run until the Rubin-Gelman statistics are below 1.050 for "A", "D" and "sD" parameters for a sample. If a particular run fails to converge, the function will proceed to double the number of "Iter" used. The doubling proceeds until convergence is reached.
+#'
+#' The function then stitches together the "A"-parameter MCMC-samples for each sample into one csv-file (this is the input for Age-Depth model of the ArchaeoPhases-package). The same is true for the "D"-parameter.
 #'
 #' @import BayLum
 #' @import Luminescence
 #' @import coda
 #' @import runjags
-#'@param DataFile The output of "Generate_DataFile()", "Generate_DataFile_MG" or "Create_DataFile" of the BayLum R-package. 
+#'@param DataFile The output of "Generate_DataFile()", "Generate_DataFile_MG" or "Create_DataFile" of the BayLum R-package.
 #'@param SampleNames A vector of names to be attached to attached to each sample.
 #'@param BinPerSample A vector of numbers indicating how many binx-files exist for samples (in order of samples structered by the DataFile-object). BinPerSample = c(1,2,1) would indicate that sample 1 and sample 3 have 1 binx-file each. Sample 2 as 2 binx-files.
 #'@param csv_name The prefix-label to put on each produced csv-file. csv_name = "example" would create csv-files named: "example_MCMC_A.csv" and "example_MCMC_D.csv".
@@ -24,7 +28,7 @@
 autorun_BayLum <- function(DataFile, SampleNames, BinPerSample, csv_name, Iter = 10000, create_new_files = TRUE, Origin_fit = TRUE, LIN_fit = FALSE, distribution = "gaussian", PriorAge = c(1, 100)) {
   # Ensure min number of iterations (limitation of Age_Computation()) in order to ensure that chains lengths are the same between samples
   Iter <- max(Iter, 10000)
-  
+
   if(create_new_files) {
     # create storage files
     write.csv(data.frame("Labcode" = SampleNames, "RG_A" = NA, "RG_D" = NA, "RG_sD" = NA, "nbins" = NA), paste(csv_name, "_RuGel.csv",sep = ""),row.names = FALSE)
@@ -45,13 +49,13 @@ autorun_BayLum <- function(DataFile, SampleNames, BinPerSample, csv_name, Iter =
     DataFile.new$Nb_measurement <- DataFile$Nb_measurement[whichbins]
     DataFile.new
   }
-  
+
   BinPerSample.df <- data.frame(SampleNames, BinPerSample)
-  
-  # add column to keep track of cumulative bin number 
+
+  # add column to keep track of cumulative bin number
   BinPerSample.df$bcumsum <- cumsum(BinPerSample)
-  
-  # create list for each sample with index for where sample is located in DataFile 
+
+  # create list for each sample with index for where sample is located in DataFile
   whichbinnumber.LIST <- lapply(BinPerSample.df$Sample, function(s){
     BinPerSample.df_temp <- BinPerSample.df[BinPerSample.df$Sample == s,]
     if(BinPerSample.df_temp$BinPerSample == 1) {
@@ -60,30 +64,30 @@ autorun_BayLum <- function(DataFile, SampleNames, BinPerSample, csv_name, Iter =
       (BinPerSample.df_temp$bcumsum-BinPerSample.df_temp$BinPerSample+1):BinPerSample.df_temp$bcumsum
     }
   })
-  
+
   # add name to list of sample index in DataFile
   names(whichbinnumber.LIST) <- paste("s",BinPerSample.df$Sample,sep="")
-  
+
   # For each sample, run BayLum till completion
   A <- lapply(1:length(whichbinnumber.LIST), function(x) {
     # read storage files
     csv_validation <- read.csv(paste(csv_name, "_RuGel.csv",sep = ""),header = T)
     MCMC_A <- read.csv(paste(csv_name, "_MCMC_A.csv",sep = ""),header = T)
     MCMC_D <- read.csv(paste(csv_name, "_MCMC_D.csv",sep = ""),header = T)
-  
+
     # extract DataFile for sample x
     targetbins <- whichbinnumber.LIST[[x]]
     DataFile_extracted <- DataFile_extractor_function(DataFile, whichbins = targetbins, whichqueue = x)
-    
+
     # create Rubin-Gelman object
     RuGel <- list("psrf" = data.frame(c(10,10,10),c(10,10,10)))
-    
+
     # initialize number of iterations to run for
     Iter.count <- Iter
-    
+
     # run BayLum
     while(sum(RuGel$psrf[, 2] < 1.050) != length(RuGel$psrf[,2])) {
-      
+
       Bay.result <- BayLum::Age_Computation(
         DATA = DataFile_extracted,
         SampleName = names(whichbinnumber.LIST)[x],
@@ -98,10 +102,10 @@ autorun_BayLum <- function(DataFile, SampleNames, BinPerSample, csv_name, Iter =
       RuGel <- coda::gelman.diag(Bay.result$Sampling, multivariate = FALSE)
       Iter.count = Iter.count*2
     }
-    
+
     # add Rubin-Gelman results to file
     csv_validation[x, ] <- c(names(whichbinnumber.LIST)[x], RuGel$psrf[1,2],RuGel$psrf[2,2], RuGel$psrf[3,2], length(DataFile_extracted$J))
-    
+
     # extract marginal posterios
     MCMC.output <- Bay.result$Sampling
     MCMC.output <- runjags::combine.mcmc(MCMC.output)
@@ -109,11 +113,11 @@ autorun_BayLum <- function(DataFile, SampleNames, BinPerSample, csv_name, Iter =
     MCMC.output_D <- as.data.frame(MCMC.output[,2])
     names(MCMC.output_A) <- names(whichbinnumber.LIST)[x]
     names(MCMC.output_D) <- names(whichbinnumber.LIST)[x]
-    
+
     MCMC_A <- coda::as.mcmc(cbind.data.frame(MCMC_A, MCMC.output_A))
     MCMC_D <- coda::as.mcmc(cbind.data.frame(MCMC_D, MCMC.output_D))
-    
-    
+
+
     write.csv(csv_validation, paste(csv_name, "_RuGel.csv",sep = ""),row.names = FALSE)
     write.csv(MCMC_A, paste(csv_name, "_MCMC_A.csv",sep = ""), row.names = FALSE)
     write.csv(MCMC_D, paste(csv_name, "_MCMC_D.csv",sep = ""), row.names = FALSE)
