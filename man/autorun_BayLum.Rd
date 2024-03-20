@@ -42,10 +42,7 @@ autorun_BayLum(
 This function returns a summary of samples that have been run along with a status-marker. More importantly, csv-files are written - one for the "A" parameter, one for the "D" parameter - in which converged output MCMC samples are sticthed together in the original sample order dictated by the DataFile-input. Credible intervals can then be computed from them or they can be used in Age-depth models. A csv-file with Rubin-Gelman statistics for all samples is also produced.
 }
 \description{
-autorun_BayLum() takes the output of "Generate_DataFile()", "Generate_DataFile_MG()" or "Create_DataFile()" - which may have been built on several samples - and runs BayLum on each sample individually.
-}
-\details{
-BayLum is run until the Rubin-Gelman statistics are below 1.050 for "A", "D" and "sD" parameters for a sample. If a particular run fails to converge, the function will proceed to double the number of "Iter" used. The doubling proceeds until convergence is reached.
-
+autorun_BayLum() takes the output of "Generate_DataFile()", "Generate_DataFile_MG()" or "Create_DataFile()" - which may have been built on several samples - and runs BayLum on each sample individually. \n
+BayLum is run until the Rubin-Gelman statistics are below 1.050 for "A", "D" and "sD" parameters for a sample. If a particular run fails to converge, the function will proceed to double the number of "Iter" used. The doubling proceeds until convergence is reached. \n
 The function then stitches together the "A"-parameter MCMC-samples for each sample into one csv-file (this is the input for Age-Depth model of the ArchaeoPhases-package). The same is true for the "D"-parameter.
 }
